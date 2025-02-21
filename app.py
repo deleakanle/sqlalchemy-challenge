@@ -1,18 +1,21 @@
 # Import the dependencies.
+import os
 import numpy as np
 import sqlalchemy
 from flask import Flask, jsonify
 from sqlalchemy import create_engine, func
 from sqlalchemy .orm import Session
 from datetime import datetime, timedelta
-from sqlalchemy.ext.automap import autobase
+from sqlalchemy.ext.automap import automap_base
 
 
 #################################################
 # Database Setup
 #################################################
-engine = create_engine("sqlite:///Resources/hawaii.sqlite")
 
+basedir = os.path.abspath(os.path.dirname(__file__))
+
+engine = create_engine("sqlite:///"+os.path.join(basedir,"Resources/hawaii.sqlite"))
 
 # reflect an existing database into a new model
 Base = automap_base()
@@ -22,7 +25,7 @@ Base.prepare(autoload_with=engine)
 
 # Save references to each table
 Measurement = Base.classes.measurement
-Sattion = Base.classes.station
+Station = Base.classes.station
 
 # Create our session (link) from Python to the DB
 session = Session(engine)
@@ -30,7 +33,7 @@ session = Session(engine)
 #################################################
 # Flask Setup
 #################################################
-app = flask(__name__)
+app = Flask(__name__)
 
 
 #################################################
@@ -48,8 +51,8 @@ def home():
          f"/api/v1.0/2013-03-13/2017-03-13"
          )
 
-         @app.routes("/api/v1.0/precipitation"
-         def preicipitation():
+@app.route("/api/v1.0/precipitation")
+def preicipitation():
     
     # Create our ession (link) from Python to the DB
     session = Session(engine)
@@ -74,7 +77,7 @@ def home():
             precipitation_dict[date] = [prcp]
 
     # Return the results in a JSON format.
-    return jsonify(precipitation_dict)
+    return jsonify(precipitation_dict) 
 
 @app.route("/api/v1.0/stations")
 def stations():
